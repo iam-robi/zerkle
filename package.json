@@ -1,0 +1,40 @@
+{
+  "name": "zerkle",
+  "version": "0.0.1",
+  "description": "ZK proof about IPLD",
+  "type": "module",
+  "scripts": {
+    "build": "rm -rf ./dist && ./node_modules/.bin/tsc -p ./tsconfig.build.json",
+    "compile": "rm -rf ./dist && ./node_modules/.bin/tsc -p ./tsconfig.json",
+    "test": "./node_modules/.bin/tsm ./node_modules/uvu/bin.js . .+\\.test\\.ts",
+    "test:watch": "./node_modules/.bin/watchlist --eager src -- pnpm run test",
+    "prepublishOnly": "pnpm run build"
+  },
+  "keywords": [],
+  "author": "Sergey Ukustov <sergey@uktv.me>",
+  "license": "GPL-3.0",
+  "files": [
+    "dist/"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "devDependencies": {
+    "@iden3/js-crypto": "^1.0.3",
+    "@types/node": "^20.10.5",
+    "hkt-toolbelt": "^0.22.2",
+    "multiformats": "^13.0.0",
+    "prettier": "^3.1.1",
+    "ts-essentials": "^9.4.1",
+    "tsm": "^2.3.0",
+    "typescript": "^5.3.3",
+    "uvu": "^0.5.6",
+    "watchlist": "^0.3.1"
+  },
+  "dependencies": {
+    "o1js": "^0.15.1"
+  }
+}
