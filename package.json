@@ -1,6 +1,6 @@
 {
-  "name": "ozkar2-zerkle",
-  "version": "1.5.0",
+  "name": "@ozkarjs/zerkle",
+  "version": "1.0.0",
   "description": "ZK proof about IPLD",
   "type": "module",
   "scripts": {

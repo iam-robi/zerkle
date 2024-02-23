@@ -13,6 +13,15 @@ devDependencies:
   '@iden3/js-crypto':
     specifier: ^1.0.3
     version: 1.0.3
+  '@tsconfig/node18':
+    specifier: 2.0.1
+    version: 2.0.1
+  '@tsconfig/recommended':
+    specifier: 1.0.2
+    version: 1.0.2
+  '@tsconfig/strictest':
+    specifier: 2.0.1
+    version: 2.0.1
   '@types/node':
     specifier: ^20.10.5
     version: 20.10.5
@@ -63,6 +72,18 @@ packages:
 
   /@iden3/js-crypto@1.0.3:
     resolution: {integrity: sha512-IFBLIN1O26mM5MVWO8dlABDC6HKLuhYs+30BT+p6dGWsNXB4Rr5JWuhKBUbKlkW78ly3j3+YSoY+J63q7vPs5Q==}
+    dev: true
+
+  /@tsconfig/node18@2.0.1:
+    resolution: {integrity: sha512-UqdfvuJK0SArA2CxhKWwwAWfnVSXiYe63bVpMutc27vpngCntGUZQETO24pEJ46zU6XM+7SpqYoMgcO3bM11Ew==}
+    dev: true
+
+  /@tsconfig/recommended@1.0.2:
+    resolution: {integrity: sha512-dbHBtbWBOjq0/otpopAE02NT2Cm05Qe2JsEKeCf/wjSYbI2hz8nCqnpnOJWHATgjDz4fd3dchs3Wy1gQGjfN6w==}
+    dev: true
+
+  /@tsconfig/strictest@2.0.1:
+    resolution: {integrity: sha512-7JHHCbyCsGUxLd0pDbp24yz3zjxw2t673W5oAP6HCEdr/UUhaRhYd3SSnUsGCk+VnPVJVA4mXROzbhI+nyIk+w==}
     dev: true
 
   /@types/node@20.10.5:
