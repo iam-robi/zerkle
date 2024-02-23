@@ -1,28 +1,44 @@
 {
-  "name": "zerkle",
-  "version": "0.0.1",
+  "name": "ozkar2-zerkle",
+  "version": "1.5.0",
   "description": "ZK proof about IPLD",
   "type": "module",
   "scripts": {
-    "build": "rm -rf ./dist && ./node_modules/.bin/tsc -p ./tsconfig.build.json",
+    "build": "pnpm clean && pnpm build:cjs && pnpm build:esm",
+    "build:cjs": "tsc --project tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > build/cjs/package.json",
+    "build:esm": "tsc --project tsconfig.esm.json",
     "compile": "rm -rf ./dist && ./node_modules/.bin/tsc -p ./tsconfig.json",
     "test": "./node_modules/.bin/tsm ./node_modules/uvu/bin.js . .+\\.test\\.ts",
     "test:watch": "./node_modules/.bin/watchlist --eager src -- pnpm run test",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "clean": "tsc --build --clean && rm -rf build"
+
+  },
+    "types": "./build/esm/index.d.ts",
+  "exports": {
+    ".": {
+      "require": {
+        "types": "./build/cjs/index.d.ts",
+        "default": "./build/cjs/index.js"
+      },
+      "import": {
+        "types": "./build/esm/index.d.ts",
+        "default": "./build/esm/index.js"
+      }
+    }
   },
   "keywords": [],
   "author": "Sergey Ukustov <sergey@uktv.me>",
   "license": "GPL-3.0",
   "files": [
-    "dist/"
+    "src",
+    "build"
   ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    }
-  },
+
   "devDependencies": {
+        "@tsconfig/node18": "2.0.1",
+    "@tsconfig/recommended": "1.0.2",
+    "@tsconfig/strictest": "2.0.1",
     "@iden3/js-crypto": "^1.0.3",
     "@types/node": "^20.10.5",
     "hkt-toolbelt": "^0.22.2",

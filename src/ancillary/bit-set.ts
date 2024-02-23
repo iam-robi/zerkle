@@ -34,7 +34,7 @@ export class BitSet {
    */
   at(index: number): boolean {
     const bits = this.bits;
-    return Boolean(parseInt(bits[bits.length - 1 - index], 2));
+    return Boolean(parseInt(bits[bits.length - 1 - index] as string, 2));
   }
 
   /**

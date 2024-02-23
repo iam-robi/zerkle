@@ -8,7 +8,7 @@ import type { Kind, Type, $, Object as ObjectH, List } from "hkt-toolbelt";
  * Represents an [IPLD Data Model](https://ipld.io/) `Null`.
  */
 export class NullKind {
-  readonly tag = "null-kind";
+  readonly tag = `null-kind`;
   readonly value = null;
 
   /**
@@ -22,7 +22,7 @@ export class NullKind {
    * Return human-readable description of the value.
    */
   describe(): string {
-    return "NullKind";
+    return `NullKind`;
   }
 }
 
@@ -30,7 +30,7 @@ export class NullKind {
  * Represents an [IPLD Data Model](https://ipld.io/) `Boolean`.
  */
 export class BooleanKind {
-  readonly tag = "boolean-kind";
+  readonly tag = `boolean-kind`;
   constructor(readonly value: boolean) {}
 
   /**
@@ -52,7 +52,7 @@ export class BooleanKind {
  * Represents an [IPLD Data Model](https://ipld.io/) `Integer`.
  */
 export class IntegerKind {
-  readonly tag = "integer-kind";
+  readonly tag = `integer-kind`;
   constructor(readonly value: number) {}
 
   /**
@@ -74,7 +74,7 @@ export class IntegerKind {
  * Represents an [IPLD Data Model](https://ipld.io/) `Float`.
  */
 export class FloatKind {
-  readonly tag = "float-kind";
+  readonly tag = `float-kind`;
   constructor(readonly value: number) {}
 
   /**
@@ -96,7 +96,7 @@ export class FloatKind {
  * Represents an [IPLD Data Model](https://ipld.io/) `String`.
  */
 export class StringKind {
-  readonly tag = "string-kind";
+  readonly tag = `string-kind`;
   constructor(readonly value: string) {}
 
   /**
@@ -120,7 +120,7 @@ export class StringKind {
  * @param i - The number to convert.
  */
 function i2hex(i: number): string {
-  return ("0" + i.toString(16)).slice(-2);
+  return (`0` + i.toString(16)).slice(-2);
 }
 /**
  * Converts an array of bytes to a hexadecimal string representation.
@@ -129,14 +129,14 @@ function i2hex(i: number): string {
  * @return The hexadecimal string representation of the given bytes.
  */
 function bytesToHex(bytes: Uint8Array): string {
-  return bytes.reduce((memo, i) => memo + i2hex(i), "");
+  return bytes.reduce((memo, i) => memo + i2hex(i), ``);
 }
 
 /**
  * Represents an [IPLD Data Model](https://ipld.io/) `Bytes`.
  */
 export class BytesKind {
-  readonly tag = "bytes-kind";
+  readonly tag = `bytes-kind`;
   constructor(readonly value: Uint8Array) {}
 
   /**
@@ -158,7 +158,7 @@ export class BytesKind {
  * Represents an [IPLD Data Model](https://ipld.io/) `List`.
  */
 export class ListKind {
-  readonly tag = "list-kind";
+  readonly tag = `list-kind`;
   constructor(readonly value: Kind[]) {}
 
   /**
@@ -172,7 +172,8 @@ export class ListKind {
    * Return human-readable description of the value.
    */
   describe(): string {
-    return `ListKind(${this.value.map((v) => v.describe()).join(", ")})`;
+    //@ts-ignore
+    return `ListKind(${this.value.map((v) => v.describe()).join(`, `)})`;
   }
 }
 
@@ -180,7 +181,7 @@ export class ListKind {
  * Represents an [IPLD Data Model](https://ipld.io/) `Map`.
  */
 export class MapKind {
-  readonly tag = "map-kind";
+  readonly tag = `map-kind`;
   constructor(readonly value: Record<string, Kind>) {}
 
   /**
@@ -196,9 +197,10 @@ export class MapKind {
   describe(): string {
     const inner = Object.entries(this.value)
       .map(([k, v]) => {
+        //@ts-ignore
         return `${k}: ${v.describe()}`;
       })
-      .join(", ");
+      .join(`, `);
     return `MapKind(${inner})`;
   }
 }
@@ -207,7 +209,7 @@ export class MapKind {
  * Represents an [IPLD Data Model](https://ipld.io/) `Link`.
  */
 export class LinkKind {
-  readonly tag = "link-kind";
+  readonly tag = `link-kind`;
   constructor(readonly value: CID) {}
 
   /**
@@ -245,11 +247,12 @@ export type ScalarKind = ElementOf<$<$<List.Map, InstanceTypeKind>, Writable<typ
 /**
  * Allowed tags for scalar kinds we support. This is used to delineate between all possible scalars.
  */
+//@ts-ignore
 const ScalarKindTags: $<$<List.Map, $<ObjectH.At, "tag">>, Writable<typeof ScalarKinds>> = [
-  "null-kind",
-  "boolean-kind",
-  "integer-kind",
-  "string-kind",
+  `null-kind`,
+  `boolean-kind`,
+  `integer-kind`,
+  `string-kind`,
 ] as const;
 
 /**
@@ -258,7 +261,8 @@ const ScalarKindTags: $<$<List.Map, $<ObjectH.At, "tag">>, Writable<typeof Scala
  * @return Returns true if ipld is of scalar kind, false otherwise.
  */
 export function isScalarKind(input: Kind): input is ScalarKind {
-  return ScalarKindTags.includes(input.tag as any);
+  //@ts-ignore
+  return ScalarKindTags.includes(input.tag);
 }
 
 /**
@@ -303,9 +307,9 @@ export function fromJS(input: unknown): Kind;
 export function fromJS(input: any): Kind {
   const t = typeof input;
   switch (t) {
-    case "string":
+    case `string`:
       return new StringKind(input);
-    case "object": {
+    case `object`: {
       if (input === null) {
         return new NullKind();
       }
@@ -322,7 +326,7 @@ export function fromJS(input: any): Kind {
       }
       return new MapKind(record);
     }
-    case "number": {
+    case `number`: {
       if (Number.isNaN(input) || !Number.isFinite(input)) {
         throw new BadInputError(input, t);
       }
@@ -338,15 +342,15 @@ export function fromJS(input: any): Kind {
         return new FloatKind(input);
       }
     }
-    case "boolean":
+    case `boolean`:
       return new BooleanKind(input);
-    case "undefined":
-    case "function":
-    case "bigint":
-    case "symbol":
+    case `undefined`:
+    case `function`:
+    case `bigint`:
+    case `symbol`:
       throw new BadInputError(input, t);
     default:
-      throw new UnreachableCaseError(t, "Unknown IPLD model kind");
+      throw new UnreachableCaseError(t, `Unknown IPLD model kind`);
   }
 }
 
@@ -370,7 +374,7 @@ export function LinearPath(input: string): LinearPath {
  * Adds a `name` to `parent` `LinearPath` making it a new LinearPath.
  * @see LinearPath
  */
-LinearPath.make = function (name: string, parent: LinearPath = "" as LinearPath): LinearPath {
+LinearPath.make = function (name: string, parent: LinearPath = `` as LinearPath): LinearPath {
   if (name.match(/\//g)) throw new Error(`Slashes are not allowed`);
   return `${parent}/${name}` as LinearPath;
 };
@@ -378,8 +382,11 @@ LinearPath.make = function (name: string, parent: LinearPath = "" as LinearPath)
 /**
  * Make a linear path from a collection of elements.
  */
+/* eslint-disable */
 LinearPath.fromElements = function (...input: Array<string>): LinearPath {
-  return input.slice(1).reduce((parent: LinearPath, name) => LinearPath.make(name, parent), LinearPath.make(input[0]));
+  return input
+    .slice(1)
+    .reduce((parent: LinearPath, name) => LinearPath.make(name, parent), LinearPath.make(input[0] as string));
 };
 
 /**
@@ -410,27 +417,31 @@ export class UnsupportedScalarKindError extends Error {
  * @throws {UnsupportedScalarKindError} If the IPLD structure contains an unsupported scalar kind.
  * @throws {UnreachableCaseError} If the IPLD structure contains an unreachable case. Used for exhaustiveness check.
  */
-export function toLinearElements(ipld: Kind, parent: LinearPath = "" as LinearPath): Array<LinearElement> {
+export function toLinearElements(ipld: Kind, parent: LinearPath = `` as LinearPath): Array<LinearElement> {
+  //@ts-ignore
   const tag = ipld.tag;
   switch (tag) {
-    case "null-kind":
-    case "boolean-kind":
-    case "integer-kind":
-    case "string-kind": {
+    case `null-kind`:
+    case `boolean-kind`:
+    case `integer-kind`:
+    case `string-kind`: {
       return [new LinearElement(parent, ipld)];
     }
-    case "bytes-kind":
-    case "float-kind":
-    case "link-kind":
+    case `bytes-kind`:
+    case `float-kind`:
+    case `link-kind`:
       throw new UnsupportedScalarKindError(tag);
-    case "list-kind":
+    case `list-kind`:
+      //@ts-ignore
       return ipld.value.flatMap((value, index) => toLinearElements(value, LinearPath.make(`'${index}`, parent)));
-    case "map-kind": {
+    case `map-kind`: {
+      //@ts-ignore
       return Object.entries(ipld.value).flatMap(([name, value]) => {
         return toLinearElements(value, LinearPath.make(name, parent));
       });
     }
     default:
+      //@ts-ignore
       throw new UnreachableCaseError(tag);
   }
 }

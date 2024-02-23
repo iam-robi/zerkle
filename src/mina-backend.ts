@@ -1,25 +1,17 @@
 import type { FieldOps } from "./merkleization/field-ops.type.js";
-import {
-  Bool,
-  CircuitString,
-  Field,
-  Poseidon,
-  Proof,
-  Provable,
-  SelfProof,
-  Struct,
-  ZkProgram,
-  verify,
-  JsonProof,
-} from "o1js";
+import type { JsonProof } from "o1js";
+import { Bool, CircuitString, Field, Poseidon, Proof, Provable, SelfProof, Struct, ZkProgram, verify } from "o1js";
 import { Tuple } from "./ancillary/tuple.js";
 import type { MerkleTreeWitness } from "./merkleization/merkle-tree.js";
-import { Condition, Query, SIGIL } from "./query.js";
-import { MerkleMap } from "./merkleization/merkle-map.js";
+import type { Condition, Query } from "./query.js";
+import { SIGIL } from "./query.js";
+import type { MerkleMap } from "./merkleization/merkle-map.js";
 import { UnreachableCaseError } from "./ancillary/unreachable-case.error.js";
 import { IpldToMerkle } from "./linearisation/ipld-to-merkle.js";
 import type { LinearizationModel } from "./linearisation/linearization-model.js";
 import { CUSTOM_INSPECT_SYMBOL } from "./ancillary/custom-inspect-symbol.js";
+/* eslint-disable */
+import type * as o1js from "o1js";
 
 export const MINA_OPS: FieldOps<Field> = {
   ZERO: Field(0n),
@@ -37,6 +29,7 @@ export const MINA_OPS: FieldOps<Field> = {
     return Field(a);
   },
 };
+//Todo : wait for https://github.com/o1-labs/o1js/issues/1447
 
 class Witness extends Struct({
   isLefts: Tuple(Bool, 255),
@@ -55,9 +48,10 @@ class Witness extends Struct({
     let key = Field(0);
 
     for (let i = 0; i < isLeft.length; i++) {
+      //@ts-ignore
       const [left, right] = maybeSwap(isLeft[i], hash, siblings[i]);
       hash = Poseidon.hash([left, right]);
-
+      //@ts-ignore
       const bit = Provable.if(isLeft[i], Field(0), Field(1));
       key = key.mul(2).add(bit);
     }
@@ -67,12 +61,19 @@ class Witness extends Struct({
 
   isValidFor(expectedRoot: Field, expectedKey: Field, value: Field): Bool {
     const [calculatedRoot, calculatedKey] = this.computeRootAndKey(value);
-    return calculatedRoot.equals(expectedRoot).and(calculatedKey.equals(expectedKey));
+    //@ts-ignore
+    return (
+      //@ts-ignore
+      calculatedRoot
+        .equals(expectedRoot)
+        //@ts-ignore
+        .and(calculatedKey.equals(expectedKey))
+    );
   }
 }
 
 function maybeSwap(b: Bool, x: Field, y: Field): [Field, Field] {
-  let m = b.toField().mul(x.sub(y)); // b*(x - y)
+  const m = b.toField().mul(x.sub(y)); // b*(x - y)
   const x_ = y.add(m); // y + b*(x - y)
   const y_ = x.sub(m); // x - b*(x - y) = x + b*(y - x)
   return [x_, y_];
@@ -85,14 +86,14 @@ class QueryOutput extends Struct({
 }) {}
 
 const SIGIL_FIELDS: { [K in keyof typeof SIGIL]: Field } = {
-  $eq: CircuitString.fromString("$eq").hash().toConstant(),
-  $ne: CircuitString.fromString("$ne").hash().toConstant(),
-  $gt: CircuitString.fromString("$gt").hash().toConstant(),
-  $lt: CircuitString.fromString("$lt").hash().toConstant(),
-  $ge: CircuitString.fromString("$ge").hash().toConstant(),
-  $le: CircuitString.fromString("$le").hash().toConstant(),
-  $and: CircuitString.fromString("$and").hash().toConstant(),
-  $or: CircuitString.fromString("$or").hash().toConstant(),
+  $eq: CircuitString.fromString(`$eq`).hash().toConstant(),
+  $ne: CircuitString.fromString(`$ne`).hash().toConstant(),
+  $gt: CircuitString.fromString(`$gt`).hash().toConstant(),
+  $lt: CircuitString.fromString(`$lt`).hash().toConstant(),
+  $ge: CircuitString.fromString(`$ge`).hash().toConstant(),
+  $le: CircuitString.fromString(`$le`).hash().toConstant(),
+  $and: CircuitString.fromString(`$and`).hash().toConstant(),
+  $or: CircuitString.fromString(`$or`).hash().toConstant(),
 };
 
 const TRACE = {
@@ -122,10 +123,9 @@ const TRACE = {
   },
 } satisfies Record<SIGIL, any>;
 
-const VERIFICATION_KEY =
-  "AgEwjSE86jiafznq/DxJVl1y1BvT/8VpTvhvIeugrCtEIYCaHjg4OIEWMhFpTw6or4UrzbeIczc+99jWGlDPmxYwnPCBejt+kX4NCvYN1Oxxobkab5B6z9azvut88Ljcdzg93eit/5hmQu7GzPjbRxZewjxqwxgf7b89+yLQI/tEHQiMy8oO1+m+VL0nUvZLXgmpg6sElYOqire0Hy2LRQ8uR78DtwNnzmFao/2BAFVNLEI6PZ9CvGi6A7VuacdI2iLzTUFmp73a6u3ymtM5ZcLfaF3DIHpQeeam2ZBpEh3mL0vN+deQUMNg0Gd0kYTTSGZFfGjdk/P9Yak1e/ZWH2A8byF0oTUmwcvxjgMnt4JTTZUQUiru16RhjACqrqSaYQaOBibOxCkLRLLQXmdUqEdxwZMp6miB6VZiapwVDo5QCbN90PrRx5W2EjQ8vY15FloZOJhq7B12SCIbUpaaUBYrJbhlOWVOUgHryjA8Tc0M0PXvGemn3irK3zmJqfvJKDP/H+8xgfW3i78c4bycWK/HSiLNZMyFVVs2bNYwZPaVJJQziXjuIviBUosh0kyQE0F+1AMp3tVzbQiP5zrPtuMAABk0FKLcyoLn+nMrvQaKdB5EwCeC1dlj2qfui7g9KH86eIvxX6Tu9v0qFEyS4Xb1IrAGp1Zkhh7vSAmiUAMkzi85EC0zeR4Rt5smoSaMhmNrBpJjgK8lxZFsNerYKJN7P7kstLWsoe1GWGQUOr/01RvVWnIhQs5AYnmcdgH0hwQTSpMSn1kjY1I7Yrov6iQNzp6qZcPLhgbuMauzcyy0rDKOmKcpZXmGy1/kaIUQVKOHtZ5z/WHPrwL8w9Omp50oJS50ccWCUDcCcu/j8ucEzFkw/LpWU+LIYaxmBWdd2345yicdFCl5LAbsyiRXMC+GqGjnV0pHWFj8efZ6toao6R93DcY8zqbyLPV/Bg491ewJ1b4fUVNmmstWcBYy8qH1PHl5laDljoCPwDcOxtW9j46+0YB+ACAhFnuOz29znpYzAzwhLvExvH1HhpJ8CxKmE16Kjj7d8rW/VROR8j997jqQFk8QKQDLmj6Iol7QIbAECX7QmtQRlRgisZ2uyd8KN0pnKusiThTKYdYxoRjrcx9WybvPW6ik8nmf2R6fWeA8B0IW9CABQgkcI3u0g1TAqB936iGG5jAOPv0WfVMBVDUPVjoRPRypSZssSsUQBuW6V1GPuutfyfTqTWloux7eKAwKbg152o5wJEhVFIlW+Sx+BT5ZzrH49bKstwR9tFYmvkmWXci/P6q2Ha2JOg1hQfLzX8vcPqYPVW1KZ8u/ZwFh2aBtuJY5c18/8f9N2PwAm24x3LC95DPfi5oDSHcHGgWURqUjW0QLhuue/zyCrnH054ACjvtF9BlsurI0HFYQKhJXdqyRHkTCyRCWMCzFEAB+jhzJHWONscP+scAdnxMPk7iC+OVf1OeVrkuJGSTraOIXVNdpXhvGPI0U3kBVJwJKKBokgsygklz063wfUEVS/B8KDvVchsZoIJEHaNs91U1ujeDjMgn31dhdXB+Q36+sMBKTGTjxs92OAOUtkxfvxwneKc8CZ5LtGneZjzYByY1TEj75Y2jsQYzitymfHVgKrw0UkvRWOkWGjltyqXZNQ5FUPp0uC7yvM5tDAlEikZiHxYXPJLGspEtkGf7QCLDboLhDbLZJFqn6gsWCWgP0zkmHioNl25bUu0RWbtweXuIsQsIwDCfULYeSWeZqKO/lSRqeDgWAW2xWCxmQH52bFPkyixRn5YdpabbRb2UOBU/osXMKRoHLpjt0XOK3DlMTep3vvVwJ6i+pjRtWnQ6OPfy8uTnTvPMPB/IJjnFhRLby2TxsNLuQwWAz/ZKIAABlwDJ8cJTCphVGUnPet6/sLbdI/HRjDvXAOgz2JpHwNMJNJ8d3gdn1QJldzIcylsyqcrLhkdecY+92ysTqAdsfBGMCH/h62HQ3ppA0r9lebrEGGc3TUalQWF7vIuP+gyB8M9llNaT88cK5x9+z5UHu3VpdEhSYko3Azck3IwzyGwQ9eMIp9OXUc1irSmzkyv1EdcuHI+f9xV6PKa2tvxgtbBXgMECg5xe4bE+tot+ZMxNGoIocrbXOEJZizJ5x3TSSETN/C2NdwUHY3rW0k56thBeOiZgmIvHutKQGQsEXOiz7G7sHN78KdHxgGQBHGnwFP7JGh0pCeIzK9JmFbVEQHMpX+KcVwr17YnF7KjePVeRXlcNysaljuLSFidZGMSGI7H8yYL25eTvOGGEVGQzdr52x7AxYsOYoFOWZbc9FCndIFeGtRGPtffERRHfHQdgOFdW50p9vyKyvkV2SSrQa7kRtby+vSUkFYWLy3S8K6TFFuS2R/JBkJ+lpHQiv9TE=";
+const VERIFICATION_KEY = `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`;
 export const QueryProgram = ZkProgram({
-  name: "query-program",
+  name: `query-program`,
   publicInput: QueryInput,
   publicOutput: QueryOutput,
   methods: {
@@ -324,7 +324,15 @@ export class Backend {
           async (map) => {
             const a = await actionA.run(map);
             const b = await actionB.run(map);
-            return this.program.and(new QueryInput({ root: map.root, key: Field.empty(), given: Field.empty() }), a, b);
+            return this.program.and(
+              new QueryInput({
+                root: map.root,
+                key: Field.empty(),
+                given: Field.empty(),
+              }),
+              a,
+              b,
+            );
           },
           TRACE.$and(actionA.expectedTrace, actionB.expectedTrace),
         );
@@ -336,7 +344,15 @@ export class Backend {
           async (map) => {
             const a = await actionA.run(map);
             const b = await actionB.run(map);
-            return this.program.or(new QueryInput({ root: map.root, key: Field.empty(), given: Field.empty() }), a, b);
+            return this.program.or(
+              new QueryInput({
+                root: map.root,
+                key: Field.empty(),
+                given: Field.empty(),
+              }),
+              a,
+              b,
+            );
           },
           TRACE.$or(actionA.expectedTrace, actionB.expectedTrace),
         );
@@ -365,7 +381,11 @@ export class Backend {
             const actual = map.get(key);
             const witness = Witness.fromMerkleTreeWitness(map.witness(key));
             const given = this.linearization.fromScalar(query.expected);
-            const input = new QueryInput({ root: map.root, given: given, key: key });
+            const input = new QueryInput({
+              root: map.root,
+              given: given,
+              key: key,
+            });
             return this.program.eq(input, witness, actual);
           },
           TRACE.$eq(key, given),
@@ -375,7 +395,11 @@ export class Backend {
           (map) => {
             const actual = map.get(key);
             const witness = Witness.fromMerkleTreeWitness(map.witness(key));
-            const input = new QueryInput({ root: map.root, given: given, key: key });
+            const input = new QueryInput({
+              root: map.root,
+              given: given,
+              key: key,
+            });
             return this.program.ne(input, witness, actual);
           },
           TRACE.$ne(key, given),
@@ -385,7 +409,11 @@ export class Backend {
           (map) => {
             const actual = map.get(key);
             const witness = Witness.fromMerkleTreeWitness(map.witness(key));
-            const input = new QueryInput({ root: map.root, given: given, key: key });
+            const input = new QueryInput({
+              root: map.root,
+              given: given,
+              key: key,
+            });
             return this.program.gt(input, witness, actual);
           },
           TRACE.$gt(key, given),
@@ -395,7 +423,11 @@ export class Backend {
           (map) => {
             const actual = map.get(key);
             const witness = Witness.fromMerkleTreeWitness(map.witness(key));
-            const input = new QueryInput({ root: map.root, given: given, key: key });
+            const input = new QueryInput({
+              root: map.root,
+              given: given,
+              key: key,
+            });
             return this.program.lt(input, witness, actual);
           },
           TRACE.$lt(key, given),
@@ -405,7 +437,11 @@ export class Backend {
           (map) => {
             const actual = map.get(key);
             const witness = Witness.fromMerkleTreeWitness(map.witness(key));
-            const input = new QueryInput({ root: map.root, given: given, key: key });
+            const input = new QueryInput({
+              root: map.root,
+              given: given,
+              key: key,
+            });
             return this.program.ge(input, witness, actual);
           },
           TRACE.$ge(key, given),
@@ -415,7 +451,11 @@ export class Backend {
           (map) => {
             const actual = map.get(key);
             const witness = Witness.fromMerkleTreeWitness(map.witness(key));
-            const input = new QueryInput({ root: map.root, given: given, key: key });
+            const input = new QueryInput({
+              root: map.root,
+              given: given,
+              key: key,
+            });
             return this.program.le(input, witness, actual);
           },
           TRACE.$le(key, given),

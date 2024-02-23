@@ -1,6 +1,9 @@
-import { FieldOps } from "./field-ops.type.js";
+import type { FieldOps } from "./field-ops.type.js";
 
-export type MerkleTreeWitness<TField> = Array<{ isLeft: boolean; sibling: TField }>;
+export type MerkleTreeWitness<TField> = Array<{
+  isLeft: boolean;
+  sibling: TField;
+}>;
 
 export class MerkleTree<TField> {
   private nodes: Record<number, Record<string, TField>> = {};
@@ -14,11 +17,13 @@ export class MerkleTree<TField> {
     this.zeroes = new Array(height);
     this.zeroes[0] = ops.ZERO;
     for (let i = 1; i < height; i += 1) {
+      //@ts-ignore
       this.zeroes[i] = ops.hash(this.zeroes[i - 1], this.zeroes[i - 1]);
     }
   }
 
   private getNode(level: number, index: bigint): TField {
+    //@ts-ignore
     return this.nodes[level]?.[index.toString()] ?? this.zeroes[level];
   }
 
