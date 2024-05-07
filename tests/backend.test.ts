@@ -1,5 +1,20 @@
-import { MerkleMapFactory, Backend, IPLD_LINEARIZATION, MINA_OPS, Verification, Query, IPLD } from "../src/index.js";
+import {
+  MerkleMapFactory,
+  Backend,
+  IPLD_LINEARIZATION,
+  MINA_OPS,
+  Verification,
+  Query,
+  IPLD,
+  QueryProgram,
+} from "../src/index.js";
 import { test } from "uvu";
+
+// test("generate verification key", async () => {
+//   const e = await QueryProgram.compile();
+//   const verificationKey = e.verificationKey;
+//   console.log("verificationKey", verificationKey);
+// });
 
 test("prove nested json", async () => {
   const resource = {

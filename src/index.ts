@@ -1,4 +1,4 @@
-import { Backend, IPLD_LINEARIZATION, MINA_OPS, Verification } from "./mina-backend.js";
+import { Backend, IPLD_LINEARIZATION, MINA_OPS, Verification, QueryProgram } from "./mina-backend.js";
 import { Query } from "./query.js";
 import { MerkleMapFactory as MapFactory } from "./merkleization/merkle-map-factory.js";
 import { Field } from "o1js";
@@ -17,4 +17,4 @@ class MerkleMapFactory extends MapFactory<Field> {
   }
 }
 
-export { MerkleMapFactory, Backend, IPLD_LINEARIZATION, MINA_OPS, Verification, Query, IPLD };
+export { MerkleMapFactory, Backend, IPLD_LINEARIZATION, MINA_OPS, Verification, Query, IPLD, QueryProgram };
